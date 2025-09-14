@@ -1,16 +1,7 @@
 package org.example.paymentservice.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
@@ -33,19 +24,32 @@ public class Payment {
     @Column(nullable = false)
     private UUID userId;
 
-    @Column(nullable = false)
-    private BigDecimal amount;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private PaymentType type; // COINS | SUBSCRIPTION | GIFT
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private PaymentStatus status; // PENDING | SUCCEEDED | FAILED
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal amountUsd;
 
     @Column(nullable = false, length = 3)
-    private String currency;
+    private String currency; // ISO-4217 (USD, EUR, ...)
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private PaymentMethod method;
+    private String productId; // e.g. "coin_pack_10", "plan-premium-monthly"
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PaymentStatus status;
+    @Lob
+    @Column(columnDefinition = "jsonb")
+    private String details;
+    // JSON с дополнительной инфой:
+    // - для COINS: { "coinsPurchased": 50 }
+    // - для SUBSCRIPTION: { "periodStart": "...", "periodEnd": "...", "autoRenew": true }
+    // - для GIFT: { "giftProductId": "...", "toUserId": "...", "message": "..." }
+
+    private String providerPaymentId; // ID транзакции в банке/провайдере
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;

@@ -35,7 +35,7 @@ public class PaymentService {
         Transaction txn = Transaction.builder()
                 .payment(savedPayment)
                 .type(TransactionType.AUTHORIZATION)
-                .amount(savedPayment.getAmount())
+                .amount(savedPayment.getAmountUsd())
                 .createdAt(Instant.now())
                 .build();
         transactionRepository.save(txn);
@@ -55,7 +55,7 @@ public class PaymentService {
         Transaction txn = Transaction.builder()
                 .payment(updatedPayment)
                 .type(TransactionType.CAPTURE)
-                .amount(payment.getAmount())
+                .amount(payment.getAmountUsd())
                 .createdAt(Instant.now())
                 .build();
         transactionRepository.save(txn);
